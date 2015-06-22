@@ -12,25 +12,20 @@ class Square
   def empty?
     @value.class == Fixnum
   end
-
-  def to_s
-    @value
-  end
 end
 
 class Board
-  attr_reader :data, :WINNING_LINES
+  attr_reader :data, :winning_lines
 
   def initialize
     @data = {}
     (1..9).each{|pos| @data[pos] = Square.new(pos)}
 
-    @WINNING_LINES = [[1,2,3],[4,5,6],[7,8,9],[1,5,9],[7,5,3],[1,4,7],[2,5,8],[3,6,9]]
+    @winning_lines = [[1,2,3],[4,5,6],[7,8,9],[1,5,9],[7,5,3],[1,4,7],[2,5,8],[3,6,9]]
   end
 
   def display
     system 'clear'
-
     puts "         |         |        "
     puts "         |         |        "
     puts "    #{@data[1].value}    |    #{@data[2].value}    |    #{@data[3].value}    "
@@ -51,7 +46,7 @@ class Board
   end
 
   def winner
-    @WINNING_LINES.each do |line|
+    @winning_lines.each do |line|
       marker = @data[line[0]].value
       if marker.class != Fixnum
         return marker if marker == @data[line[1]].value && marker == @data[line[2]].value 
@@ -79,7 +74,7 @@ end
 class Player
   attr_reader :name, :marker
 
-  def initialize(name)
+  def initialize(name = nil)
     @name = name
     @marker = nil
   end
@@ -112,13 +107,10 @@ class Player
   end
 end
 
-class Computer < Player
-end
-
 class Game
   def initialize
     @board = Board.new
-    @user = Player.new(nil)
+    @user = Player.new
     @computer = Player.new('CPU')
   end
 
@@ -131,7 +123,7 @@ class Game
   def move(player)
     if player.name == 'CPU'
       possible_moves = []
-      @board.WINNING_LINES.each do |line|
+      @board.winning_lines.each do |line|
         comp_squares = line.select{|sqr| @board.data[sqr].value == @computer.marker}
         empty_squares = line.select{|sqr| @board.data[sqr].value.class == Fixnum}
         user_squares = line.select{|sqr| @board.data[sqr].value.class == @user.marker}
@@ -173,7 +165,6 @@ class Game
     player1 = @user.marker == 'X' ? @user : @computer
     player2 = @user.name == player1.name ? @computer : @user
     @computer.marker = player1 == @computer ? 'X' : 'O'
-    players = [player1, player2]
     loop do 
       @board = Board.new
       @board.display
